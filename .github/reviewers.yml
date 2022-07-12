@@ -1,0 +1,29 @@
+reviewers:
+  # The default reviewers, if nothing matched, this will be selected
+  defaults:
+    - team:juggle-fish # GitHub team
+
+  groups:
+    # change the developers usernames below to fit with each team
+    current-developers:
+      - ces-truongvu
+      - ces-haunguyen
+      - ces-phuoctruong
+      - ces-tien-truong
+
+files:
+  '**':
+    - team:juggle-fish
+  # You can assign groups defined above as well as GitHub usernames.
+  # '**':
+  #   - current-developers
+
+options:
+  ignore_draft: true
+  ignored_keywords:
+    - DO NOT REVIEW
+  enable_group_assignment: true
+
+  # Randomly pick reviewers up to this number.
+  # Do not set this option if you'd like to assign all matching reviewers.
+  # number_of_reviewers: 4

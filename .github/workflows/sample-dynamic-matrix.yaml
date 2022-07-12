@@ -1,0 +1,93 @@
+name: Sample Dynamic Matrix
+
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - main
+    tags:
+      - staging.*
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      MATRIX: ${{ steps.set-matrix.outputs.MATRIX }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - id: set-matrix
+        run: |
+          git fetch
+
+          export SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
+          export SET_RELEASE=$(git describe --tags --always ${GITHUB_SHA})
+          export STAGING_TAG=$(echo "$GITHUB_REF" | grep -P "refs/tags/staging\.\\d+")
+
+          echo "Release: $SET_RELEASE"
+          echo "Staging: $STAGING_TAG"
+          echo "Hash: $SHORT_SHA"
+
+          if [ ! -z "$STAGING_TAG" -a "$STAGING_TAG" != "" ]; then
+            # matching tag pattern 'staging.[0-9]'
+
+            echo "Staging..."
+
+            export MATRIX="{\"include\":[
+                {
+                  \"namespace\":\"staging\",
+                  \"tag\":\"$SHORT_SHA\",
+                  \"release\":\"$SET_RELEASE\"
+                }
+            ]}"
+          elif [ "$SET_RELEASE" = "$SHORT_SHA" ]; then
+            # when no tag found, two variables are equal
+
+            echo "Development..."
+
+            export MATRIX="{\"include\":[
+                {
+                  \"namespace\":\"development\",
+                  \"tag\":\"$SHORT_SHA\",
+                  \"release\":\"\"
+                }
+            ]}"
+          else
+            # matching publish release version
+
+            echo "Production..."
+
+            export MATRIX="{\"include\":[
+                {
+                  \"namespace\":\"staging\",
+                  \"tag\":\"$SHORT_SHA\",
+                  \"release\":\"$SET_RELEASE\"
+                }
+            ]}"
+          fi
+
+          echo "::set-output name=MATRIX::$(echo $MATRIX)"
+
+  build:
+    runs-on: ubuntu-latest
+    needs: matrix
+    strategy:
+      matrix: ${{fromJson(needs.matrix.outputs.matrix)}}
+    env:
+      FIREBASE_KEYS_DEVELOPMENT: ${{ secrets.CES_JUGGLE_FISH_FIREBASE_KEYS_DEVELOPMENT }}
+      FIREBASE_KEYS_STAGING: ${{ secrets.CES_JUGGLE_FISH_FIREBASE_KEYS_STAGING }}
+      IMAGE_DEVELOPMENT: asia.gcr.io/${{ secrets.CES_JUGGLE_FISH_GKE_PROJECT }}/development/$GITHUB_WORKFLOW
+      IMAGE_STAGING: asia.gcr.io/${{ secrets.CES_JUGGLE_FISH_GKE_PROJECT }}/staging/$GITHUB_WORKFLOW
+    steps:
+    - run: |
+        echo ${{ MATRIX.namespace }}
+        echo ${{ MATRIX.tag }}
+
+    - name: Set Suffix
+      run: echo SUFFIX=$(echo "${{ MATRIX.namespace }}" | tr 'a-z' 'A-Z') >> $GITHUB_ENV
+
+    - name: Set environment variables dynamically
+      run: |
+        echo IMAGE_REGISTRY_PATH=${{ env[format('IMAGE_{0}', env.SUFFIX)] }} >> $GITHUB_ENV
+        echo FIREBASE_KEYS=${{ env[format('FIREBASE_KEYS_{0}', env.SUFFIX)] }} >> $GITHUB_ENV
