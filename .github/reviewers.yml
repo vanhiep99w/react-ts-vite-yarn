@@ -1,22 +1,17 @@
 reviewers:
   # The default reviewers, if nothing matched, this will be selected
   defaults:
-    - team:juggle-fish # GitHub team
+    - team:liferay # GitHub team
 
   groups:
     # change the developers usernames below to fit with each team
     current-developers:
-      - ces-truongvu
-      - ces-haunguyen
-      - ces-phuoctruong
-      - ces-tien-truong
-
+      - ces-anhho
+      - ces-ThaoPhan
 files:
-  '**':
-    - team:juggle-fish
   # You can assign groups defined above as well as GitHub usernames.
-  # '**':
-  #   - current-developers
+  '**':
+    - current-developers
 
 options:
   ignore_draft: true
