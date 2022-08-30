@@ -1,20 +1,15 @@
 import React from "react";
-import { Paper } from "@mui/material";
-import BoxContainerTop from "@/components/common/BoxContainer/BoxContainerTop";
+import { Paper, SxProps } from "@mui/material";
+import BoxContainerTop from "./BoxContainerTop";
 
-interface IProps {
-  children: React.ReactNode | React.ReactComponentElement;
+interface Props {
+  children: React.ReactNode;
+  sx?: SxProps;
 }
-type VerticalAligment = "top" | "center" | "bottom";
-type HorizintalAligment = "left" | "center" | "right";
 
-type Aligment =
-  | Exclude<`${VerticalAligment}-${HorizintalAligment}`, "center-center">
-  | "center";
-
-const BoxContainer = ({ children }: IProps) => {
+const BoxContainer = ({ children, sx }: Props) => {
   return (
-    <Paper elevation={2} sx={{ p: 2 }}>
+    <Paper elevation={1} sx={{ p: 2, ...sx }}>
       {children}
     </Paper>
   );
@@ -23,3 +18,7 @@ const BoxContainer = ({ children }: IProps) => {
 export default BoxContainer;
 
 BoxContainer.Top = BoxContainerTop;
+
+BoxContainer.defaultProps = {
+  sx: {}
+};

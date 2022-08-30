@@ -26,7 +26,7 @@
   },
   "plugins": ["react"],
   "rules": {
-    "no-unused-vars": "warn",
+    "no-unused-vars": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-filename-extension": ["warn", { "extensions": [".tsx"] }],
     "import/extensions": [
@@ -41,7 +41,9 @@
     "no-plusplus": "off",
     "import/prefer-default-export": "off",
     "react/button-has-type": "off",
-    "react/function-component-definition": "off"
+    "react/function-component-definition": "off",
+    "no-param-reassign": "off",
+    "react/jsx-props-no-spreading": "off"
   },
   "ignorePatterns": ["node_modules/", "vite.config.ts"]
 }
