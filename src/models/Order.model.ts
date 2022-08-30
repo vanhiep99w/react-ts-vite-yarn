@@ -1,5 +1,5 @@
-import { OrderStatus } from "@/entities/OrderStatus";
-import { Account } from "@/entities/Account";
+import { OrderStatus } from "./OrderStatus.model";
+import { Account } from "./Account.model";
 
 export interface Order {
   id: number;

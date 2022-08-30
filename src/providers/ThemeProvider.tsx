@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React from "react";
 import { ThemeProvider as ThemeProviderMUI } from "@mui/material";
 import { customTheme } from "@/configs";
 

@@ -1,14 +1,20 @@
-import { Account } from "@/entities/Account";
-import { headlessConfig } from "@/configs/headlessConfig";
+import { headlessConfig } from "@/configs";
+import { convertAccount } from "@/helpers";
+import { Pageable, Account } from "@/models";
 
 const ACCOUNTS_BASE_URL = "headless-commerce-admin-account/v1.0/accounts/";
 
-export const queryAccountsByName = async (name: string): Promise<Account[]> => {
-  const rest = await headlessConfig.get(ACCOUNTS_BASE_URL, {
+export const queryAccountsByName = async (
+  name: string,
+  pageQuery?: Pageable
+): Promise<Account[]> => {
+  const {
+    data: { items }
+  } = await headlessConfig.get(ACCOUNTS_BASE_URL, {
     params: {
-      search: name
+      search: name,
+      ...pageQuery
     }
   });
-
-  return rest.data;
+  return items.map((item: any) => convertAccount(item));
 };
