@@ -1,46 +1,33 @@
 import React, { useEffect } from "react";
-import { BoxContainer, Label } from "@/components/common";
+import { BoxContainer } from "@/components/common";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
+import { fetchStatusStatisticsInfo } from "@/redux/statistics";
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import { convertDataChart } from "./helpers";
 
-interface IProps {}
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const data = {
-  labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-  datasets: [
-    {
-      label: "# of Votes",
-      data: [12, 19, 3, 5, 2, 3],
-      backgroundColor: [
-        "rgba(255, 99, 132, 0.2)",
-        "rgba(54, 162, 235, 0.2)",
-        "rgba(255, 206, 86, 0.2)",
-        "rgba(75, 192, 192, 0.2)",
-        "rgba(153, 102, 255, 0.2)",
-        "rgba(255, 159, 64, 0.2)"
-      ],
-      borderColor: [
-        "rgba(255, 99, 132, 1)",
-        "rgba(54, 162, 235, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(153, 102, 255, 1)",
-        "rgba(255, 159, 64, 1)"
-      ],
-      borderWidth: 1
-    }
-  ]
-};
+const PipeChart = () => {
+  const dispatch = useAppDispatch();
+  const { data } = useAppSelector((state) => state.statistics);
+  const { selectedAccount, endDate, startDate } = useAppSelector(
+    (state) => state.filter
+  );
+  useEffect(() => {
+    const accountIds = selectedAccount.map((account) => account.id);
+    dispatch(fetchStatusStatisticsInfo({ accountIds, startDate, endDate }));
+  }, [endDate, startDate, JSON.stringify(selectedAccount)]);
 
-const PipeChart: React.FC<IProps> = () => {
   return (
     <BoxContainer>
       <BoxContainer.Top title="Order status" />
-      <Box maxWidth="500px">
-        <Pie data={data} />
-      </Box>
+      <Stack alignItems="center">
+        <Box width={500}>
+          <Pie data={convertDataChart(data)} />
+        </Box>
+      </Stack>
     </BoxContainer>
   );
 };
